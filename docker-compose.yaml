@@ -1,0 +1,29 @@
+version: "3"
+services:
+  client:
+    image: client
+    depends_on:
+      - worker
+    links:
+      - rabbit:rabbit
+      - redis:redis
+    command: ['./client-wait.sh']
+  worker:
+    image: worker
+    depends_on:
+      - rabbit
+      - redis
+    links:
+      - rabbit:rabbit
+      - redis:redis
+      # worker must wait for both
+      # rabbit & redis to comp. start
+    command: ['./worker-wait.sh']
+  rabbit:
+    image: rabbitmq:latest
+    expose:
+      - "5672"
+  redis:
+    image: redis:latest
+    expose:
+      - "6379"
